@@ -63,36 +63,43 @@ fn preprocess(input : Bytes) -> Array[Array[UInt]] {
 }
 
 ///|
+/// Rotate right by `shift` bits on a 32-bit word.
 pub fn rtor(data : UInt, shift : Int) -> UInt {
   (data >> shift) | (data << (32 - shift))
 }
 
 ///|
+/// SHA-256 lower sigma0 function.
 pub fn lower_sigma0(word : UInt) -> UInt {
   rtor(word, 7) ^ rtor(word, 18) ^ (word >> 3)
 }
 
 ///|
+/// SHA-256 lower sigma1 function.
 pub fn lower_sigma1(word : UInt) -> UInt {
   rtor(word, 17) ^ rtor(word, 19) ^ (word >> 10)
 }
 
 ///|
+/// SHA-256 upper sigma0 function.
 pub fn upper_sigma0(word : UInt) -> UInt {
   rtor(word, 2) ^ rtor(word, 13) ^ rtor(word, 22)
 }
 
 ///|
+/// SHA-256 upper sigma1 function.
 pub fn upper_sigma1(word : UInt) -> UInt {
   rtor(word, 6) ^ rtor(word, 11) ^ rtor(word, 25)
 }
 
 ///|
+/// SHA-256 choose function.
 pub fn ch(x : UInt, y : UInt, z : UInt) -> UInt {
   (x & y) ^ (x.lnot() & z)
 }
 
 ///|
+/// SHA-256 majority function.
 pub fn maj(x : UInt, y : UInt, z : UInt) -> UInt {
   (x & y) ^ (x & z) ^ (y & z)
 }
@@ -162,11 +169,13 @@ fn compute_hash(blocks : Array[Array[UInt]]) -> Bytes {
 }
 
 ///|
+/// Compute the SHA-256 digest as raw bytes (32 bytes).
 pub fn sha256(input : Bytes) -> Bytes {
   compute_hash(preprocess(input))
 }
 
 ///|
+/// Compute the SHA-256 digest as a hex string (64 chars).
 pub fn sha256_hexdigest(input : Bytes) -> String {
   bytes_to_hex(sha256(input))
 }
