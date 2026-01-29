@@ -2,8 +2,8 @@
   "name": "shu-kitamura/sha256",
   "version": "0.1.0",
   "readme": "README.mbt.md",
-  "repository": "",
+  "repository": "https://github.com/shu-kitamura/sha256.mbt",
   "license": "Apache-2.0",
-  "keywords": [],
-  "description": ""
+  "keywords": ["sha256", "hash", "moonbit"],
+  "description": "A simple sha256 algorithm implemented in moonbit"
 }
