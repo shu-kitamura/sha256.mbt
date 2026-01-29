@@ -13,20 +13,7 @@ let k : ReadOnlyArray[UInt] = [
 ]
 
 ///|
-fn to_ascii_bytes(input : String) -> Array[Byte] {
-  // The original Python version encodes with ASCII; mirror that here.
-  input
-  .to_array()
-  .map(fn(ch) {
-    if !ch.is_ascii() {
-      panic()
-    }
-    ch.to_int().to_byte()
-  })
-}
-
-///|
-fn padding(data : Array[Byte]) -> Array[Byte] {
+fn padding(data : Bytes) -> Array[Byte] {
   let length = data.length()
   let n = loop 1 {
     n => if length * 8 < 1 << (8 * n) { n } else { continue n + 1 }
@@ -60,8 +47,8 @@ fn bytes_to_u32_be(data : Array[Byte], offset : Int) -> UInt {
 }
 
 ///|
-fn preprocess(input : String) -> Array[Array[UInt]] {
-  let padded = padding(to_ascii_bytes(input))
+fn preprocess(input : Bytes) -> Array[Array[UInt]] {
+  let padded = padding(input)
   let num_blocks = padded.length() / 64
   let blocks : Array[Array[UInt]] = Array::new()
   for block_index = 0; block_index < num_blocks; block_index = block_index + 1 {
@@ -111,16 +98,26 @@ pub fn maj(x : UInt, y : UInt, z : UInt) -> UInt {
 }
 
 ///|
-fn word_to_hex(word : UInt) -> String {
-  let b0 = ((word >> 24) & 0xff).to_byte()
-  let b1 = ((word >> 16) & 0xff).to_byte()
-  let b2 = ((word >> 8) & 0xff).to_byte()
-  let b3 = (word & 0xff).to_byte()
-  b0.to_hex() + b1.to_hex() + b2.to_hex() + b3.to_hex()
+fn write_u32_be(out : Array[Byte], offset : Int, word : UInt) -> Unit {
+  out[offset] = ((word >> 24) & 0xff).to_byte()
+  out[offset + 1] = ((word >> 16) & 0xff).to_byte()
+  out[offset + 2] = ((word >> 8) & 0xff).to_byte()
+  out[offset + 3] = (word & 0xff).to_byte()
 }
 
 ///|
-fn compute_hash(blocks : Array[Array[UInt]]) -> String {
+fn bytes_to_hex(bytes : Bytes) -> String {
+  for i = 0, acc = ""
+      i < bytes.length()
+      i = i + 1, acc = acc + bytes[i].to_hex() {
+
+  } else {
+    acc
+  }
+}
+
+///|
+fn compute_hash(blocks : Array[Array[UInt]]) -> Bytes {
   let ws : Array[UInt] = Array::make(64, UInt::default())
   let h : Array[UInt] = [
     0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a, 0x510e527f, 0x9b05688c, 0x1f83d9ab,
@@ -157,14 +154,19 @@ fn compute_hash(blocks : Array[Array[UInt]]) -> String {
     h[6] = h[6] + g
     h[7] = h[7] + h1
   }
-  for i = 0, acc = ""; i < 8; i = i + 1, acc = acc + word_to_hex(h[i]) {
-
-  } else {
-    acc
+  let out = Array::make(32, (0).to_byte())
+  for i = 0; i < 8; i = i + 1 {
+    write_u32_be(out, i * 4, h[i])
   }
+  Bytes::from_array(out)
 }
 
 ///|
-pub fn sha256(input : String) -> String {
+pub fn sha256(input : Bytes) -> Bytes {
   compute_hash(preprocess(input))
+}
+
+///|
+pub fn sha256_hexdigest(input : Bytes) -> String {
+  bytes_to_hex(sha256(input))
 }

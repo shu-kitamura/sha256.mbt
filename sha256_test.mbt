@@ -26,20 +26,21 @@ test "ch and maj" {
 ///|
 test "sha256 vectors" {
   inspect(
-    sha256(""),
+    sha256_hexdigest(b""),
     content="e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
   )
   inspect(
-    sha256("hello"),
+    sha256_hexdigest(b"hello"),
     content="2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824",
   )
   inspect(
-    sha256("test"),
+    sha256_hexdigest(b"test"),
     content="9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08",
   )
-  let long = "a".repeat(120)
+  // 120 bytes of 'a' (0x61)
+  let long = Bytes::make(120, b'a')
   inspect(
-    sha256(long),
+    sha256_hexdigest(long),
     content="2f3d335432c70b580af0e8e1b3674a7c020d683aa5f73aaaedfdc55af904c21c",
   )
 }
