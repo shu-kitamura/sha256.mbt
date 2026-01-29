@@ -1,25 +1,26 @@
-# shu-kitamura/sha256
+# sha256.mbt
 
-SHA-256 ハッシュアルゴリズムの MoonBit 実装です。
+MoonBit implementation of the SHA-256 hash algorithm.
 
-## インストール
+## Installation
 
 ```bash
 moon add shu-kitamura/sha256
 ```
 
-## 使い方
+## Usage
 
 ```moonbit
 ///|
 fn main {
-  let hash = @sha256.sha256_hexdigest(b"hello")
-  println(hash)
-  // => 2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824
+  let digest_bytes = @sha256.sha256(b"hello")
+  // => Bytes (32 bytes)
+
+  let digest_hex = @sha256.sha256_hexdigest(b"hello")
+  // => String (64 hex chars)
 }
 ```
 
-### API
+## License
 
-- `sha256(input : Bytes) -> Bytes` - 入力バイト列の SHA-256 ハッシュ値をバイト列で返します
-- `sha256_hexdigest(input : Bytes) -> String` - 入力バイト列の SHA-256 ハッシュ値を16進数文字列で返します
+Apache-2.0
